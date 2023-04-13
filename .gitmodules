@@ -1,0 +1,3 @@
+[submodule "arduino-motion-track"]
+	path = arduino-motion-track
+	url = https://github.com/evan-soloway/arduino-motion-tracking-with-py-cv2
