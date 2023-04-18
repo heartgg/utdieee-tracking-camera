@@ -2,10 +2,20 @@
 import cv2
 import time
 
-# defines a webcam object
-# index specifies camera to operate. 0 in this case uses my webcam
-cap = cv2.VideoCapture(0)
 
+# user chooses which camera to use
+cameraSelect = input("0 for Webcam, 1 for Arducam")
+while cameraSelect is not 0 or 1:
+    cameraSelect = input("0 for Webcam, 1 for Arducam")
+
+# Define camera object
+cap = cv2.VideoCapture()
+
+# selects webcam or camera object
+if cameraSelect == 0:
+    cap = cv2.VideoCapture(0)
+elif cameraSelect == 1:
+    cap = cv2.VideoCapture(1)
 
 # Initialize tracker
 tracker = cv2.legacy.TrackerKCF_create()
