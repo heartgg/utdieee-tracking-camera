@@ -40,7 +40,7 @@ newFrameTime = 0
 
 def drawBox(img, boundingBox):
     x, y, w, h = int(boundingBox[0]), int(boundingBox[1]), int(boundingBox[2]), int(boundingBox[3])
-    cv2.rectan   gle(img, (x,y), ((x+w), (y+h)), (255, 0, 255), 3, 1)
+    cv2.rectangle(img, (x,y), ((x+w), (y+h)), (255, 0, 255), 3, 1)
 
     #Calculate center coordinates
     centerX = int(x + (w/2))
