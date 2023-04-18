@@ -8,7 +8,7 @@ cap = cv2.VideoCapture(0)
 
 
 # Initialize tracker
-tracker = cv2.legacy.TrackerCSRT_create()
+tracker = cv2.legacy.TrackerKCF_create()
 
 success, img = cap.read()
 
@@ -30,12 +30,18 @@ newFrameTime = 0
 
 def drawBox(img, boundingBox):
     x, y, w, h = int(boundingBox[0]), int(boundingBox[1]), int(boundingBox[2]), int(boundingBox[3])
-    cv2.rectangle(img, (x,y), ((x+w), (y+h)), (255, 0, 255), 3, 1)
+    cv2.rectan   gle(img, (x,y), ((x+w), (y+h)), (255, 0, 255), 3, 1)
 
     #Calculate center coordinates
     centerX = int(x + (w/2))
     centerY = int(y + (h/2))
     cv2.circle(img, (centerX, centerY), 5, (255, 0, 255), -1)
+
+
+    cv2.line(img, (0, centerY), (640, centerY), 5)
+    cv2.line(img, (centerX, 0), (centerX, 640), 5)
+
+
     print( "X:", str(centerX), "Y:", str(centerY))
 
     cv2.putText(img, "Tracking", (75, 75), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 255, 0), 2)
@@ -43,6 +49,7 @@ def drawBox(img, boundingBox):
 while True:
 
     readSuccess, img = cap.read()
+    #print(img.shape)
 
     boxSuccess, boundingBox = tracker.update(img) # Updates the bounding box
     #print(boundingBox)
