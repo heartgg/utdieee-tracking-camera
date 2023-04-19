@@ -113,6 +113,6 @@ def main():
     readLoop(prevFrameTime, newFrameTime)
 
     # release the capture
-    cap.release()
+    cap.stop()
 
 main()
