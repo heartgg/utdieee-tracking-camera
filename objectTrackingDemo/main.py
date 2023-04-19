@@ -45,6 +45,8 @@ def drawBox(img, boundingBox):
 
     cv2.putText(img, "Tracking", (75, 75), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 255, 0), 2)
 
+
+newFrameTime = 0
 prevFrameTime = 0
 while True:
 
