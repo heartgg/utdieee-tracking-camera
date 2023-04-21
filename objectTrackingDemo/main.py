@@ -1,14 +1,8 @@
 
 import cv2
 import time
-#from Fps import FPS
-#from WebcamVideoStream import WebcamVideoStream
 from imutils.video import FPS
 from imutils.video import WebcamVideoStream
-from VideoShow import VideoShow
-
-
-
 
 
 
