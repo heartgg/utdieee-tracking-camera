@@ -1,28 +1,15 @@
 
 import cv2
 import time
-from Fps import FPS
-from WebcamVideoStream import WebcamVideoStream
+#from Fps import FPS
+#from WebcamVideoStream import WebcamVideoStream
+from imutils.video import FPS
+from imutils.video import WebcamVideoStream
+from VideoShow import VideoShow
 
 
 
-# Define camera object and start the stream
-cap = WebcamVideoStream(src=0)
-cap.start()
 
-# Define fps object and run it
-fps = FPS()
-fps.start()
-
-# Capture the first frame
-img = cap.read()
-
-# Initialize tracker
-tracker = cv2.legacy.TrackerKCF_create()
-
-boundingBox = cv2.selectROI("Tracking", img, True)
-# Initialize tracker with bounding box
-tracker.init(img,boundingBox)
 
 
 # This function draws a bounding box around the targeted area, calculating its center coordinates
@@ -46,44 +33,73 @@ def drawBox(img, boundingBox):
     cv2.putText(img, "Tracking", (75, 75), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 255, 0), 2)
 
 
-newFrameTime = 0
-prevFrameTime = 0
-while True:
 
+if __name__ == '__main__':
+
+    # Define camera object and start the stream
+    cap = WebcamVideoStream(src=0)
+    cap.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
+    cap.stream.set(cv2.CAP_PROP_FPS,30)
+    cap.start()
+
+    # Define fps object and run it
+    fps = FPS()
+    fps.start()
+
+    # Capture the first frame
     img = cap.read()
-    #print(img.shape)
 
-    boxSuccess, boundingBox = tracker.update(img) # Updates the bounding box
-    #print(boundingBox)
+    # Initialize tracker
+    tracker = cv2.legacy.TrackerMOSSE_create()
 
+    boundingBox = cv2.selectROI("Tracking", img, True)
 
-    if boxSuccess:
-        drawBox(img, boundingBox)
-    else:
-        cv2.putText(img, "Lost", (75, 75), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 255), 2)
+    # Initialize tracker with bounding box
+    tracker.init(img, boundingBox)
 
-
-    # Calculates FPS
-    newFrameTime = time.time()
-    framesPerSecond = 1/ (newFrameTime - prevFrameTime)
-    prevFrameTime = newFrameTime
-
-    # Update frames
-    fps.update()
-
-    # displays formatting on video feed
-    cv2.putText(img, str(int(framesPerSecond)), (75, 50), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 255), 2)
-    cv2.imshow("Tracking", img)
-
-    # If q key has been pressed, stop program
-    if cv2.waitKey(1) & 0xff == ord('q'):
-        break
+    # Initialize initial frame time to 0.
+    newFrameTime = 0
+    prevFrameTime = 0
 
 
+    while True:
 
-fps.stop()
-print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+        img = cap.read()
 
-# Clean up processes
-cv2.destroyAllWindows()
-cap.stop()
+        boxSuccess, boundingBox = tracker.update(img) # Updates the bounding box
+        #print(boundingBox)
+
+
+        if boxSuccess:
+            drawBox(img, boundingBox)
+        else:
+            cv2.putText(img, "Lost", (75, 75), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 255), 2)
+
+
+        # Calculates FPS
+        newFrameTime = time.time()
+        framesPerSecond = 1/ (newFrameTime - prevFrameTime)
+        prevFrameTime = newFrameTime
+
+        # Update frames
+        fps.update()
+
+        # displays formatting on video feed
+        cv2.putText(img, str(int(framesPerSecond)), (75, 50), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 255), 2)
+        cv2.imshow("Tracking", img)
+
+        # If q key has been pressed, stop program
+        if cv2.waitKey(1) & 0xff == ord('q'):
+            fps.stop()
+            cap.stop()
+
+            break
+
+
+    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+
+    # Clean up processes
+    cv2.destroyAllWindows()
+
