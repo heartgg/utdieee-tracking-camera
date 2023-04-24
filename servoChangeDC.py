@@ -20,11 +20,11 @@ def translateToDC(servoPin, angle):
 	servoPWM.stop()
 
 while True:
-	for angle in range (0, 180, 20):
+	for angle in range (0, 180, 45):
 		translateToDC(tilt, angle)
 		translateToDC(pan, angle)
 		sleep(0.5)
-	for angle in range(180, 0, -20):
+	for angle in range(180, 0, -45):
 		translateToDC(tilt, angle)
 		translateToDC(pan, angle)
 		sleep(0.5)
