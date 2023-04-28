@@ -1,26 +1,58 @@
 
 import cv2
 import time
-from Fps import FPS
-from WebcamVideoStream import WebcamVideoStream
+from threading import Thread
+from imutils.video import FPS
+from imutils.video import WebcamVideoStream
+from imutils.video import VideoStream 
+
+class VideoShow:
+    # Separates imshow() into its own dedicated thread 
+    
+    def __init__(self, frame=None):
+        self.frame = frame
+        self.stopped = False
+        
+    def start(self):
+        Thread(target=self.show, args=()).start()
+        return self
+        
+    def show(self): 
+        while not self.stopped:
+            cv2.imshow("Video", self.frame)
+            if cv2.waitKey(1) == ord('q'):
+                self.stopped = True
+                
+    def stop(self):
+        self.stopped = True 
+        
+
 
 
 
 # Define camera object and start the stream
-cap = WebcamVideoStream(src=0)
+#cap = WebcamVideoStream()
+cap = VideoStream(src=0, usePiCamera=False, resolution=(640, 480), framerate=30)
 cap.start()
 
 # Define fps object and run it
 fps = FPS()
 fps.start()
 
+ 
+
 # Capture the first frame
 img = cap.read()
 
-# Initialize tracker
-tracker = cv2.legacy.TrackerKCF_create()
+# Define VideoShow object (takes place of cv2 imshow() )
+#videoFeed = VideoShow(img)
+#videoFeed.start()
 
-boundingBox = cv2.selectROI("Tracking", img, True)
+
+# Initialize tracker
+tracker = cv2.legacy.TrackerMOSSE_create()
+
+boundingBox = cv2.selectROI("Tracking", img, True, False)
 # Initialize tracker with bounding box
 tracker.init(img,boundingBox)
 
@@ -48,8 +80,12 @@ def drawBox(img, boundingBox):
 
 newFrameTime = 0
 prevFrameTime = 0
-while True:
 
+resetServo(pan)
+resetServo(tilt)
+
+while True:
+    
     img = cap.read()
     #print(img.shape)
 
@@ -73,7 +109,13 @@ while True:
 
     # displays formatting on video feed
     cv2.putText(img, str(int(framesPerSecond)), (75, 50), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 255), 2)
+    
+    # Non-multithreaded
     cv2.imshow("Tracking", img)
+    
+    # With multithreading 
+    #videoFeed.show() 
+    #videoFeed.frame = img
 
     # If q key has been pressed, stop program
     if cv2.waitKey(1) & 0xff == ord('q'):
@@ -86,4 +128,5 @@ print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 
 # Clean up processes
 cv2.destroyAllWindows()
+#videoFeed.stop()
 cap.stop()
