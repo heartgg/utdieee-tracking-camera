@@ -13,9 +13,9 @@ pan = 18
 tilt = 17
 
 
-# Base duty  cycle angles 
+# Base duty  cycle angles
 panDC = 90
-tiltDC = 90 
+tiltDC = 90
 
 
 # assign GPIO pins to PWM channels
@@ -27,38 +27,38 @@ tiltPWM = GPIO.PWM(tilt,50)
 
 
 #def translateToDC(servoPWM, angle):
-    #servoPWM.ChangeDutyCycle(5. + angle / 36.)
-    #sleep(0.5)
-	
-        
+#servoPWM.ChangeDutyCycle(5. + angle / 36.)
+#sleep(0.5)
 
-    
 
-        
+
+
+
+
 def computeServoResponse(x, y, originX, originY):
 
     # X is the face center x-coordinate
     # Y is the face center y-coordinate
-    
+
     # originX is the frame center x-coordinate
     # originY is the frame center y-coordinate
-    
+
     global panDC
     global tiltDC
-    
-    
-    # Debugging 
+
+
+    # Debugging
     print("PanDC: ", panDC)
     print("tiltDC: ", tiltDC)
-    
- 
-    
+
+
+
     if (x < originX + 40): # if x coordinate of center is 40 from x-center of frame, move pan right
         panDC += 20
         if panDC > 150:
             panDC = 180
         panPWM.ChangeDutyCycle(5. + panDC / 36.)
-        
+
     if(x > originX - 40): # if x coordinate of center is -40 from x-center of frame, move pan left
         panDC -= 20
         if panDC < 30:
@@ -75,16 +75,16 @@ def computeServoResponse(x, y, originX, originY):
         if tiltDC < 30:
             tiltDC = 0
         tiltPWM.ChangeDutyCycle(5. + tiltDC / 36.)
-    
-        
-    
+
+
+
 
 
 # This function draws a bounding box around the targeted area, calculating its center coordinates
 # and drawing a vertical and horizontal axes through the center.
 def drawBox(img, boundingBox):
     x, y, w, h = int(boundingBox[0]), int(boundingBox[1]), int(boundingBox[2]), int(boundingBox[3])
-    
+
     cv2.rectangle(img, (x,y), ((x+w), (y+h)), (255, 0, 255), 3, 1)
 
     frameCenterX = 320
@@ -101,17 +101,17 @@ def drawBox(img, boundingBox):
     computeServoResponse(centerX, centerY, frameCenterX, frameCenterY)
 
 if __name__ == '__main__':
-    
-   
+
+
     #Define camera object and start the stream
-    cap = cv2.VideoCapture(-1); 
+    cap = cv2.VideoCapture(-1);
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     cap.set(cv2.CAP_PROP_FPS,30)
-    
-    
-    # Set servos to 90 degrees initiallity 
+
+
+    # Set servos to 90 degrees initiallity
     panPWM.start(7.5)
-    tiltPWM.start(7.5) 
+    tiltPWM.start(7.5)
 
 
     # Capture the first frame
@@ -136,20 +136,20 @@ if __name__ == '__main__':
 
 
     while True:
-        
-     
+
+
         ret, img = cap.read()
-        img = cv2.resize(img, (640, 480)) 
+        img = cv2.resize(img, (640, 480))
         #time.sleep(1)
-        
-    
+
+
         boxSuccess, boundingBox = tracker.update(img) # Updates the bounding box
         #print(boundingBox)
 
 
         if boxSuccess:
-           drawBox(img, boundingBox)
-           time.sleep(0.1)
+            drawBox(img, boundingBox)
+            time.sleep(0.1)
         else:
             cv2.putText(img, "Lost", (75, 75), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 255), 2)
 
